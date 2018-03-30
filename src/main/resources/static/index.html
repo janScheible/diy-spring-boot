@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang=en>
+	<head>
+		<meta charset=utf-8>
+		<title>DIY Spring Boot Demo Application</title>
+		
+		<script src="webjars/jquery/3.3.1/jquery.js"></script>
+		
+		<style>
+			body {
+				font-family: Sans-Serif;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>DIY Spring Boot Demo Application</h1>
+		<div>
+			<span>Name: </span>
+			<input id="name-input" type="text" autofocus>
+		</div>
+		<div id="greeting"></div>
+
+		<script>
+			$('#name-input').on('keypress', function (event) {
+				if (event.which === 13) {
+					const inputEl = $(this);
+					$.ajax('greet/' + encodeURIComponent(encodeURIComponent(inputEl.val())))
+							.then((data) => $('#greeting').text(data))
+							.catch(() => alert('Something went terribly wrong...'));
+					inputEl.val('');
+				}
+			});
+		</script>
+	</body>
+</html>

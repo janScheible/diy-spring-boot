@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+	<action>
+		<actionName>build</actionName>
+		<packagings>
+			<packaging>*</packaging>
+		</packagings>
+		<goals>
+			<goal>install</goal>
+		</goals>
+		<properties>
+			<assembly.skipAssembly>true</assembly.skipAssembly>
+		</properties>
+	</action>
+	<action>
+		<actionName>rebuild</actionName>
+		<packagings>
+			<packaging>*</packaging>
+		</packagings>
+		<goals>
+			<goal>clean</goal>
+			<goal>install</goal>
+		</goals>
+		<properties>
+			<assembly.skipAssembly>true</assembly.skipAssembly>
+		</properties>
+	</action>
+	<action>
+		<actionName>CUSTOM-Full Build</actionName>
+		<displayName>Full Build</displayName>
+		<goals>
+			<goal>clean</goal>
+			<goal>install</goal>
+		</goals>
+	</action>
+	<action>
+		<actionName>debug</actionName>
+		<packagings>
+			<packaging>jar</packaging>
+		</packagings>
+		<goals>
+			<goal>process-classes</goal>
+			<goal>org.codehaus.mojo:exec-maven-plugin:1.2.1:exec</goal>
+		</goals>
+		<properties>
+			<exec.args>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath ${main.class}</exec.args>
+			<exec.executable>java</exec.executable>
+			<jpda.listen>true</jpda.listen>
+		</properties>
+	</action>
+	<action>
+		<actionName>run</actionName>
+		<packagings>
+			<packaging>jar</packaging>
+		</packagings>
+		<goals>
+			<goal>process-classes</goal>
+			<goal>org.codehaus.mojo:exec-maven-plugin:1.2.1:exec</goal>
+		</goals>
+		<properties>
+			<exec.args>-classpath %classpath ${main.class}</exec.args>
+			<exec.executable>java</exec.executable>
+		</properties>
+	</action>
+	<action>
+		<actionName>CUSTOM-Sortpom</actionName>
+		<displayName>Sortpom</displayName>
+		<goals>
+			<goal>com.github.ekryd.sortpom:sortpom-maven-plugin:sort</goal>
+		</goals>
+		<properties>
+			<sort.nrOfIndentSpace>-1</sort.nrOfIndentSpace>
+			<sort.keepBlankLines>true</sort.keepBlankLines>
+		</properties>
+	</action>
+	<action>
+		<actionName>CUSTOM-Findbugs</actionName>
+		<displayName>Findbugs</displayName>
+		<goals>
+			<goal>findbugs:findbugs</goal>
+		</goals>
+	</action>
+</actions>
