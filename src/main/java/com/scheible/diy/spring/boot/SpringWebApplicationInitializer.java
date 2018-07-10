@@ -1,10 +1,12 @@
 package com.scheible.diy.spring.boot;
 
 import com.scheible.diy.spring.boot.application.DemoApplicationConfig;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.Map;
+import java.util.Properties;
 import java.util.jar.Manifest;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -13,6 +15,10 @@ import org.eclipse.jetty.servlet.DefaultServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.PropertiesPropertySource;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.util.ResourceUtils;
 import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
@@ -28,6 +34,10 @@ public class SpringWebApplicationInitializer implements WebApplicationInitialize
 	@Override
 	public void onStartup(ServletContext servletContext) throws ServletException {
 		AnnotationConfigWebApplicationContext webCtx = new AnnotationConfigWebApplicationContext();
+		
+		webCtx.getEnvironment().getPropertySources().addLast(loadApplicationProperties());
+		webCtx.getEnvironment().getPropertySources().addFirst(loadExternalProperties(webCtx.getEnvironment()));
+		
 		webCtx.addApplicationListener((ContextRefreshedEvent event)
 				-> logger.info("Spring " + getSpringVersion(event.getClass()).replace(".RELEASE", "") + " context refreshed"));
 		webCtx.register(WebJarsController.class, DemoApplicationConfig.class);
@@ -42,6 +52,36 @@ public class SpringWebApplicationInitializer implements WebApplicationInitialize
 		defaultServletRegistration.addMapping("/");
 	}
 
+	private PropertiesPropertySource loadApplicationProperties() {
+		Properties properties = new Properties();
+		
+		ClassPathResource applicationPropertiesResource = new ClassPathResource("/config/application.properties", this.getClass().getClassLoader());
+		if(applicationPropertiesResource.exists()) {			
+			try {
+				properties.load(applicationPropertiesResource.getInputStream());
+			} catch (IOException ex) {
+				throw new IllegalStateException(ex);
+			}			
+		}
+		
+		return new PropertiesPropertySource("application-properties", properties);
+	}
+	
+	private PropertiesPropertySource loadExternalProperties(Environment environment) {
+		Properties properties = new Properties();
+
+		String externalLocation = environment.getProperty("spring.config.additional-location");
+		if (externalLocation != null) {
+			try {
+				properties.load(new FileInputStream(ResourceUtils.getFile(externalLocation)));
+			} catch (IOException ex) {
+				throw new IllegalStateException(ex);
+			}
+		}
+
+		return new PropertiesPropertySource("external-properties", properties);
+	}
+	
 	private String getSpringVersion(Class<?> springClass) {
 		if (springClass.getPackage().getImplementationVersion() != null &&
 				!springClass.getPackage().getImplementationVersion().equals(getClass().getPackage().getImplementationVersion())) { // NOTE Only available while running in IDE. 
