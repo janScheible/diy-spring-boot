@@ -17,7 +17,7 @@
 		<main.class>com.scheible.diy.spring.boot.JettyWebServer</main.class>
 
 		<jetty.version>9.4.31.v20200723</jetty.version>
-		<spring.version>5.2.9.RELEASE</spring.version>
+		<spring.version>5.3.18</spring.version>
 
 		<jquery.version>3.5.1</jquery.version>
 	</properties>
